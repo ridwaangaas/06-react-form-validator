@@ -7,9 +7,8 @@ import './app.scss'
 
 // let validate = false;
 
-function App() {
+const initialState ={
 
-  const [state, setState] = useImmer({
     email: '',
     password: '',
     confirmPassword: '',
@@ -21,7 +20,11 @@ function App() {
       color: '',
       value: ''
     }
-  });
+  };
+
+function App() {
+
+  const [state, setState] = useImmer(initialState);
 
   const validate = (
     state.email
@@ -46,7 +49,7 @@ function App() {
         className="form-control" 
         type="text" 
         data-rules="required|digits:5|min:5"
-        placeholder="email required"
+        placeholder="Email required"
         value={state.email || ''}
           onChange={(event) => {
             setState((draft) => {
@@ -76,6 +79,7 @@ draft.showInvalidEmail = !EmailValidator.validate(state?.email)
         <label>Password</label>
         <input className="form-control" 
         type={state.showPassword ? 'text': 'password'}
+        placeholder="Password required"
         data-rules="required|string|min:5" 
         value={state.password || ''}
        onChange={(event) => {
@@ -118,7 +122,7 @@ draft.isPasswordShort = state.password.length < 8;
            && <p className="validator-err">Password must at least 8 characters </p>
          }
 
-         {/* {
+         {
           state.password && <button
           style={{
             position: 'absolute',
@@ -127,38 +131,54 @@ draft.isPasswordShort = state.password.length < 8;
             width: 50,
             padding: '0px !important',
             margin: '0',
-            fontSize: '2',
+            fontSize: '0.5em',
             border: 'none !important',
           }}
           type='button'
           onClick={() => {
             setState((draft) => {
               draft.showPassword = !draft.showPassword;
-              
+              if (!state.showPassword) {
+                draft.confirmPassword = state.password;
+                draft.passwordMatch = true;
+                
+              }
+              else {
+                draft.passwordMatch = false;
+                draft.confirmPassword = ''
+              }
             });
           }}
           >eye</button>
-         } */}
+         } 
       </div>
-{/* {
-  !state.showPassword &&
-} */}
+{
+  !state.showPassword
+   &&
       <div className="mb-4">
         <label>Password Confirm</label>
         <input 
         className="form-control" 
         type="password" 
         data-rules="required|string|min:5"
+        placeholder="Confirm password"
            value={state.confirmPassword || ''}
             onChange={(event) => {
             setState((draft) => {
               draft.confirmPassword = event.target.value;
+              draft.passwordMatch = event.target.value === state.password
             });
           }}
-        
+
            />
          
         </div>
+}
+{
+  !state.passwordMatch 
+  && state.confirmPassword
+  && <p className="validator-err">passwords must match</p>
+}
             {
               state.passwordStrength.value
               && <div className="mb-4"
@@ -177,6 +197,13 @@ draft.isPasswordShort = state.password.length < 8;
       style={{
         backgroundColor: validate ? '': 'gray'
       }}
+      onClick={() => {
+        alert("Congratulations! Your form is validated and we're creating the user for you")
+          setState(initialState);
+        
+      }}
+type="button"
+
       >
         CREATE EMAIL
         </button>
