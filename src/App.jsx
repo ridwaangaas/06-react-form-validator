@@ -149,7 +149,7 @@ draft.isPasswordShort = state.password.length < 8;
               }
             });
           }}
-          >eye</button>
+          >see/hide</button>
          } 
       </div>
 {
